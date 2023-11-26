@@ -356,6 +356,7 @@ type stopCtx struct {
 var goroutines atomic.Int32
 
 // &cancelCtxKey is the key that a cancelCtx returns itself for.
+// 这里有个细节是 package lvl 下的变量地址是唯一且不变的,所以后续用它来作为key
 var cancelCtxKey int
 
 // parentCancelCtx returns the underlying *cancelCtx for parent.
@@ -369,6 +370,7 @@ func parentCancelCtx(parent Context) (*cancelCtx, bool) {
 	if done == closedchan || done == nil {
 		return nil, false
 	}
+	// 这里就是说,如果传入的是cancelCtxKey 的地址,那么我们就是获得parent 本身
 	p, ok := parent.Value(&cancelCtxKey).(*cancelCtx)
 	if !ok {
 		return nil, false
@@ -462,7 +464,7 @@ func (c *cancelCtx) propagateCancel(parent Context, child canceler) {
 	if done == nil {
 		return // parent is never canceled
 	}
-
+	// 这里是检查parent 是否已经触发
 	select {
 	case <-done:
 		// parent is already canceled
