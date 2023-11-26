@@ -430,6 +430,7 @@ func (c *cancelCtx) Value(key any) any {
 	return value(c.Context, key)
 }
 
+// 这里2次load,应该就是类似原子变量操作一样,减少加锁的次数
 func (c *cancelCtx) Done() <-chan struct{} {
 	d := c.done.Load()
 	if d != nil {
