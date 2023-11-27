@@ -335,6 +335,8 @@ type afterFuncCtx struct {
 }
 
 func (a *afterFuncCtx) cancel(removeFromParent bool, err, cause error) {
+	// 这里为什么要分开写,而不是直接传入removeFromParent,原因是cancelCtx.cancel 中执行removeChild 是传入a.cancelCtx.Context
+	// 而这里需要的是a.Context,a.Context是会通过embed 升级为afterFuncCtx.Context
 	a.cancelCtx.cancel(false, err, cause)
 	if removeFromParent {
 		removeChild(a.Context, a)
@@ -365,6 +367,10 @@ var cancelCtxKey int
 // parent.Done() matches that *cancelCtx. (If not, the *cancelCtx
 // has been wrapped in a custom implementation providing a
 // different done channel, in which case we should not bypass it.)
+// 这里隐含的 意义是,我们自定义的struct 可能 覆盖 Value 或者 Done method,所以这里做个判断,只有真正matches that *cancelCtx,才会返回true
+// 同时这里也隐含了,同一个cancelCtx context 可能被反腐wrapped
+// 其实这个函数目前看就是 判断parent 是不是*cancelCtx
+// 比如我们传入backgroud ,就直接返回false
 func parentCancelCtx(parent Context) (*cancelCtx, bool) {
 	done := parent.Done()
 	if done == closedchan || done == nil {
@@ -478,6 +484,7 @@ func (c *cancelCtx) propagateCancel(parent Context, child canceler) {
 	if p, ok := parentCancelCtx(parent); ok {
 		// parent is a *cancelCtx, or derives from one.
 		p.mu.Lock()
+		// 我们拿到底层的context struct以后,这里也隐含着真正cancel 一个 context,不仅仅是close channel,同时也会将err赋值
 		if p.err != nil {
 			// parent has already been canceled
 			child.cancel(false, p.err, p.cause)
