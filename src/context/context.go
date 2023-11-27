@@ -457,6 +457,8 @@ func (c *cancelCtx) Err() error {
 
 // propagateCancel arranges for child to be canceled when parent is.
 // It sets the parent context of cancelCtx.
+// 这里为什么用propagate 很大一部分原因是cancelCtx 本身覆盖了Done 和 Value method
+// 所以对于parent context, 需要传递给子 context
 func (c *cancelCtx) propagateCancel(parent Context, child canceler) {
 	c.Context = parent
 
@@ -504,6 +506,7 @@ func (c *cancelCtx) propagateCancel(parent Context, child canceler) {
 	}
 
 	goroutines.Add(1)
+	// 从这里也能看出,在创建子 context的时候,我们也会启动一个goroutines,用来跟踪后续,cancel事件
 	go func() {
 		select {
 		case <-parent.Done():
@@ -546,6 +549,7 @@ func (c *cancelCtx) cancel(removeFromParent bool, err, cause error) {
 	c.err = err
 	c.cause = cause
 	d, _ := c.done.Load().(chan struct{})
+	// 真正执行cancel 是这里
 	if d == nil {
 		c.done.Store(closedchan)
 	} else {
