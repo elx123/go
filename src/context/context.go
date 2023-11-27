@@ -647,8 +647,10 @@ func WithDeadlineCause(parent Context, d time.Time, cause error) (Context, Cance
 		c.timer = time.AfterFunc(dur, func() {
 			c.cancel(true, DeadlineExceeded, cause)
 		})
+		// 这里是因为超时而关闭
 	}
 	return c, func() { c.cancel(true, Canceled, nil) }
+	// 这里是主动关闭
 }
 
 // A timerCtx carries a timer and a deadline. It embeds a cancelCtx to
