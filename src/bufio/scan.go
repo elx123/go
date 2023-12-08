@@ -62,6 +62,7 @@ type Scanner struct {
 // The function is never called with an empty data slice unless atEOF
 // is true. If atEOF is true, however, data may be non-empty and,
 // as always, holds unprocessed text.
+// 这里我们深究下SplitFunc的返回值的含义,第一个advance,代表了消化了多少个字符,这里需要和advance()函数配合,token应该就是截取的字符串结果,这点也可以从Text()得到验证
 type SplitFunc func(data []byte, atEOF bool) (advance int, token []byte, err error)
 
 // Errors returned by Scanner.
@@ -132,6 +133,8 @@ var ErrFinalToken = errors.New("final token")
 // Scan panics if the split function returns too many empty
 // tokens without advancing the input. This is a common error mode for
 // scanners.
+// 从split在Scan中调用的逻辑来看,split是控制这个截取字符串的核心逻辑
+// 这里我可以又要说了,是不是我们可以定制自己的split函数,这里ExampleScanner_custom 可以验证我的想法
 func (s *Scanner) Scan() bool {
 	if s.done {
 		return false
@@ -264,6 +267,7 @@ func (s *Scanner) setErr(err error) {
 // maximum token size to MaxScanTokenSize.
 //
 // Buffer panics if it is called after scanning has started.
+// 用来设置Scanner 内部buf
 func (s *Scanner) Buffer(buf []byte, max int) {
 	if s.scanCalled {
 		panic("Buffer called after Scan")
@@ -392,6 +396,7 @@ func isSpace(r rune) bool {
 // space-separated word of text, with surrounding spaces deleted. It will
 // never return an empty string. The definition of space is set by
 // unicode.IsSpace.
+
 func ScanWords(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	// Skip leading spaces.
 	start := 0
