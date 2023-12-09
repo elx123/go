@@ -33,6 +33,7 @@ func ExampleWriter_AvailableBuffer() {
 }
 
 // The simplest use of a Scanner, to read standard input as a set of lines.
+// 从这个例子看出,从输入源,按照指定的规则,去获取数据,然后输出
 func ExampleScanner_lines() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
