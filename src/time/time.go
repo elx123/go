@@ -84,22 +84,38 @@ import (
 )
 
 // A Time represents an instant in time with nanosecond precision.
+// Time 表示纳秒精度的时间瞬间
 //
 // Programs using times should typically store and pass them as values,
 // not pointers. That is, time variables and struct fields should be of
 // type time.Time, not *time.Time.
 //
+// 使用时间的程序通常应该将它们作为值存储和传递，
+// 而不是指针。也就是说，时间变量和结构字段应该是
+// time.Time 类型，而不是 *time.Time
+//
 // A Time value can be used by multiple goroutines simultaneously except
 // that the methods GobDecode, UnmarshalBinary, UnmarshalJSON and
 // UnmarshalText are not concurrency-safe.
+//
+// Time 值可以被多个 goroutine 同时使用，除非方法 GobDecode、UnmarshalBinary、UnmarshalJSON 和
+// UnmarshalText 不是并发安全的
 //
 // Time instants can be compared using the Before, After, and Equal methods.
 // The Sub method subtracts two instants, producing a Duration.
 // The Add method adds a Time and a Duration, producing a Time.
 //
+// 可以使用 Before、After 和 Equal 方法比较时间点。
+// Sub 方法减去两个时刻，产生一个 Duration。
+// Add 方法添加一个 Time 和一个 Duration，生成一个 Time
+//
 // The zero value of type Time is January 1, year 1, 00:00:00.000000000 UTC.
 // As this time is unlikely to come up in practice, the IsZero method gives
 // a simple way of detecting a time that has not been initialized explicitly.
+//
+// Time 类型的零值是 1 年 1 月 1 日 00:00:00.000000000 UTC。
+// 由于这个时间在实践中不太可能出现，IsZero 方法
+// 提供了一种简单的方法来检测尚未显式初始化的时间
 //
 // Each Time has associated with it a Location, consulted when computing the
 // presentation form of the time, such as in the Format, Hour, and Year methods.
@@ -107,6 +123,12 @@ import (
 // Changing the location in this way changes only the presentation; it does not
 // change the instant in time being denoted and therefore does not affect the
 // computations described in earlier paragraphs.
+//
+// 每个时间都有一个与其关联的位置，在计算时间的表示形式时参考，例如在 Format、Hour 和 Year 方法中。
+// Local、UTC 和 In 方法返回具有特定位置的时间。
+// 以这种方式更改位置仅更改演示文稿；
+// 它不会改变所表示的时刻，因此不会影响前面段落中描述的
+// 计算
 //
 // Representations of a Time value saved by the GobEncode, MarshalBinary,
 // MarshalJSON, and MarshalText methods store the Time.Location's offset, but not
