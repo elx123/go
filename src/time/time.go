@@ -7,6 +7,14 @@
 // The calendrical calculations always assume a Gregorian calendar, with
 // no leap seconds.
 //
+// 这句话的意思是，所有的日历计算都假定使用的是公历（Gregorian calendar），并且不考虑闰秒12345。
+// 公历，也被称为格里高利历或西历，是目前全球最广泛使用的日历系统。
+// 它的主要特点是每四年有一个闰年，闰年的二月份有29天12345。
+// 闰秒是一种时间调整方式，用于将精确的原子时与地球的自转速度相匹配。
+// 因为地球的自转速度会受到各种因素的影响，所以有时候需要添加闰秒来保持时间的准确2。
+// 但在这里，所有的日历计算都不考虑闰秒，也就是说，每一分钟都假定恒定为60秒12345。
+// 希望这个答案对你有所帮助！
+//
 // # Monotonic Clocks
 //
 // Operating systems provide both a “wall clock,” which is subject to
@@ -19,9 +27,21 @@
 // operations, specifically comparisons and subtractions, use the
 // monotonic clock reading.
 //
+// 操作系统提供了一个“挂钟”，它受
+// 时钟同步的变化，以及“单调时钟”，即
+// 不是。一般规则是，挂钟是用来报时的
+// 单调时钟用于测量时间。而不是拆分 API，
+// 在这个包中，time.Now 返回的 Time 包含一面墙
+// 时钟读数和单调时钟读数；稍后报时
+// 操作使用挂钟读数，但稍后进行时间测量
+// 运算，特别是比较和减法，使用
+// 单调时钟读取。
+//
 // For example, this code always computes a positive elapsed time of
 // approximately 20 milliseconds, even if the wall clock is changed during
 // the operation being timed:
+//
+// 例如，此代码始终计算大约 20 毫秒的正运行时间，即使在计时操作期间挂钟发生了变化
 //
 //	start := time.Now()
 //	... operation that takes 20 milliseconds ...
@@ -32,9 +52,17 @@
 // time.Now().Before(deadline), are similarly robust against wall clock
 // resets.
 //
+// 其他习惯用法，例如 time.Since(start)、time.Until(deadline) 和
+// time.Now().Before(deadline)，对于挂钟重置同样具有鲁棒性
+//
 // The rest of this section gives the precise details of how operations
 // use monotonic clocks, but understanding those details is not required
 // to use this package.
+//
+// 本节的其余部分给出了操作如何使用单调时钟的精确细节，但使用此包不需要理解这些细节。
+// 因为我们不会在使用的时候,将一个Time 放在同时使用wall clock 和 Monotonic clock的环境中,因此
+// 我感觉之后的注释没啥用
+// ------------------------------------------------------------------------------------------
 //
 // The Time returned by time.Now contains a monotonic clock reading.
 // If Time t has a monotonic clock reading, t.Add adds the same duration to
@@ -44,6 +72,15 @@
 // Because t.In, t.Local, and t.UTC are used for their effect on the interpretation
 // of the wall time, they also strip any monotonic clock reading from their results.
 // The canonical way to strip a monotonic clock reading is to use t = t.Round(0).
+//
+// time.Now返回的Time包含一个单调时钟读数。
+// 如果Time t有一个单调时钟读数，t.Add会将相同的持续时间添加到
+// 墙上时钟和单调时钟读数来计算结果。
+// 因为t.AddDate(y, m, d)，t.Round(d)和t.Truncate(d)是墙上时间
+// 计算，它们总是从结果中剥离任何单调时钟读数。
+// 因为t.In，t.Local和t.UTC用于它们对墙上时间解释的影响，
+// 它们也从结果中剥离任何单调时钟读数。
+// 剥离单调时钟读数的规范方法是使用t = t.Round(0)。
 //
 // If Times t and u both contain monotonic clock readings, the operations
 // t.After(u), t.Before(u), t.Equal(u), t.Compare(u), and t.Sub(u) are carried out
@@ -134,10 +171,19 @@ import (
 // MarshalJSON, and MarshalText methods store the Time.Location's offset, but not
 // the location name. They therefore lose information about Daylight Saving Time.
 //
+// 由 GobEncode、MarshalBinary、MarshalJSON 和 MarshalText
+// 方法保存的时间值的表示形式存储 Time.Location 的偏移量，
+// 但不存储位置名称。因此他们会丢失有关夏令时的信息
+//
 // In addition to the required “wall clock” reading, a Time may contain an optional
 // reading of the current process's monotonic clock, to provide additional precision
 // for comparison or subtraction.
 // See the “Monotonic Clocks” section in the package documentation for details.
+//
+// 除了所需的“挂钟”读数之外，Time 还可以包含当前进程单调时钟的可选
+// 读数，以提供额外的精度
+// 用于比较或减法。
+// 有关详细信息，请参阅包文档中的“单调时钟”部分
 //
 // Note that the Go == operator compares not just the time instant but also the
 // Location and the monotonic clock reading. Therefore, Time values should not
@@ -148,9 +194,20 @@ import (
 // to t == u, since t.Equal uses the most accurate comparison available and
 // correctly handles the case when only one of its arguments has a monotonic
 // clock reading.
+//
+// 请注意，Go == 运算符不仅比较时刻，还比较
+// 位置和单调时钟读数。因此，如果没有首先保证为所有值设置了相同的位置（这可以通过使用 UTC 或 Local 方法以及单调性来实现），则
+// 时间值不应用作地图或数据库键。
+// 时钟读数已通过设置 t = t.Round(0) 被剥离。一般来说，更喜欢 t.Equal(u)
+// 而不是 t == u，因为 t.Equal 使用最准确的可用比较，并且
+// 正确处理只有其中一个参数具有单调
+// 时钟读数的情况
 type Time struct {
 	// wall and ext encode the wall time seconds, wall time nanoseconds,
 	// and optional monotonic clock reading in nanoseconds.
+	//
+	// wall 和 ext 对 wall time 秒、wall time 纳秒进行编码，
+	// 以及可选的单调时钟读数（以纳秒为单位）
 	//
 	// From high to low bit position, wall encodes a 1-bit flag (hasMonotonic),
 	// a 33-bit seconds field, and a 30-bit wall time nanoseconds field.
@@ -160,6 +217,15 @@ type Time struct {
 	// If the hasMonotonic bit is 1, then the 33-bit field holds a 33-bit
 	// unsigned wall seconds since Jan 1 year 1885, and ext holds a
 	// signed 64-bit monotonic clock reading, nanoseconds since process start.
+	//
+	// // 从高位到低位位置，wall编码一个1位标志（hasMonotonic），
+	// 33 位秒字段和 30 位墙壁时间纳秒字段。
+	// 纳秒字段的范围是 [0, 999999999]。
+	// 如果 hasMonotonic 位为 0，则 33 位字段必须为零
+	// 自 1 年 1 月 1 日起完整签名的 64 位墙秒存储在 ext.
+	// 如果 hasMonotonic 位为 1，则 33 位字段保存 33 位
+	// 自 1885 年 1 月 1 日以来的无符号墙秒，并且 ext 持有
+	// 带符号的 64 位单调时钟读数，自进程启动以来的纳秒数。
 	wall uint64
 	ext  int64
 
@@ -168,6 +234,10 @@ type Time struct {
 	// that correspond to this Time.
 	// The nil location means UTC.
 	// All UTC times are represented with loc==nil, never loc==&utcLoc.
+	//
+	// loc 指定用于确定与该时间对应的分钟、小时、月、日和年的位置。
+	// nil 位置表示 UTC。
+	// 所有UTC时间都用loc==nil表示，从不用loc==&utcLoc表示
 	loc *Location
 }
 
