@@ -63,7 +63,7 @@
 // 因为我们不会在使用的时候,将一个Time 放在同时使用wall clock 和 Monotonic clock的环境中,因此
 // 我感觉之后的注释没啥用
 // ------------------------------------------------------------------------------------------
-//
+// -----------------------------部分翻译在org roam 中 ----------------------------------------
 // The Time returned by time.Now contains a monotonic clock reading.
 // If Time t has a monotonic clock reading, t.Add adds the same duration to
 // both the wall clock and monotonic clock readings to compute the result.
@@ -72,15 +72,6 @@
 // Because t.In, t.Local, and t.UTC are used for their effect on the interpretation
 // of the wall time, they also strip any monotonic clock reading from their results.
 // The canonical way to strip a monotonic clock reading is to use t = t.Round(0).
-//
-// time.Now返回的Time包含一个单调时钟读数。
-// 如果Time t有一个单调时钟读数，t.Add会将相同的持续时间添加到
-// 墙上时钟和单调时钟读数来计算结果。
-// 因为t.AddDate(y, m, d)，t.Round(d)和t.Truncate(d)是墙上时间
-// 计算，它们总是从结果中剥离任何单调时钟读数。
-// 因为t.In，t.Local和t.UTC用于它们对墙上时间解释的影响，
-// 它们也从结果中剥离任何单调时钟读数。
-// 剥离单调时钟读数的规范方法是使用t = t.Round(0)。
 //
 // If Times t and u both contain monotonic clock readings, the operations
 // t.After(u), t.Before(u), t.Equal(u), t.Compare(u), and t.Sub(u) are carried out
