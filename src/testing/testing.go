@@ -1758,6 +1758,13 @@ func (f matchStringOnly) SnapshotCoverage()                       {}
 // systems that simulate "go test" using Main, but Main sometimes cannot be updated as
 // new functionality is added to the testing package.
 // Systems simulating "go test" should be updated to use MainStart.
+
+// Main是一个内部函数，部分执行“go test”命令。
+// 它被导出是因为它是跨包并且早于“内部”包。
+// 它不再被“go test”使用，而是尽可能保留给其他使用 Main 模拟“go test”的系统，但 Main 有时无法更新，因为
+// 新功能被添加到测试中包裹。
+// 模拟“go test”的系统应更新为使用 MainStart
+
 func Main(matchString func(pat, str string) (bool, error), tests []InternalTest, benchmarks []InternalBenchmark, examples []InternalExample) {
 	os.Exit(MainStart(matchStringOnly(matchString), tests, benchmarks, nil, examples).Run())
 }
