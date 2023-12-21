@@ -914,6 +914,13 @@ var _ TB = (*B)(nil)
 //
 // The other reporting methods, such as the variations of Log and Error,
 // may be called simultaneously from multiple goroutines.
+
+// T 是传递给 Test 函数的类型，用于管理测试状态并支持格式化测试日志。
+//
+// 当其 Test 函数返回或调用任何方法
+// FailNow、Fatal、Fatalf、SkipNow、Skip 或 Skipf 时，测试结束。这些方法以及 Parallel 方法只能从运行 Test 函数的 goroutine 中调用。
+//
+// 其他报告方法，例如 Log 和 Error 的变体， // 可以从多个 goroutine 同时调用
 type T struct {
 	common
 	isEnvSet bool
@@ -1124,6 +1131,10 @@ func (c *common) Skipped() bool {
 // Helper marks the calling function as a test helper function.
 // When printing file and line information, that function will be skipped.
 // Helper may be called simultaneously from multiple goroutines.
+
+// Helper 将调用函数标记为测试帮助函数。
+// 当打印文件和行信息时，该函数将被跳过。
+// 多个 goroutine 可以同时调用 Helper
 func (c *common) Helper() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
