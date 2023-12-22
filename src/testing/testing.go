@@ -1156,6 +1156,8 @@ func (c *common) Helper() {
 // Cleanup registers a function to be called when the test (or subtest) and all its
 // subtests complete. Cleanup functions will be called in last added,
 // first called order.
+//
+// Cleanup 注册一个在测试（或子测试）及其所有子测试完成时调用的函数。清理函数将按最后添加、最先调用的顺序调用
 func (c *common) Cleanup(f func()) {
 	c.checkFuzzFn("Cleanup")
 	var pc [maxStackLen]uintptr
