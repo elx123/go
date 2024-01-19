@@ -38,8 +38,12 @@ import (
 // and additionally handles HTTP details such as cookies and
 // redirects.
 //
+// 客户端(Client)比RoundTripper（如Transport）更高级，它还处理HTTP的细节，比如cookies和重定向。
+//
 // When following redirects, the Client will forward all headers set on the
 // initial Request except:
+//
+// 在遵循重定向时，客户端会转发初始请求中设置的所有头信息，除了以下情况：
 //
 // • when forwarding sensitive headers like "Authorization",
 // "WWW-Authenticate", and "Cookie" to untrusted targets.
@@ -48,6 +52,10 @@ import (
 // For example, a redirect from "foo.com" to either "foo.com" or "sub.foo.com"
 // will forward the sensitive headers, but a redirect to "bar.com" will not.
 //
+// • 当转发像“Authorization”、“WWW-Authenticate”和“Cookie”这样的敏感头信息到不受信任的目标时。
+// 当遵循重定向到一个不是初始域名的子域匹配或精确匹配的域时，这些头信息将被忽略。
+// 例如，从"foo.com"重定向到"foo.com"或"sub.foo.com"将会转发敏感头信息，但重定向到"bar.com"则不会。
+//
 // • when forwarding the "Cookie" header with a non-nil cookie Jar.
 // Since each redirect may mutate the state of the cookie jar,
 // a redirect may possibly alter a cookie set in the initial request.
@@ -55,6 +63,11 @@ import (
 // with the expectation that the Jar will insert those mutated cookies
 // with the updated values (assuming the origin matches).
 // If Jar is nil, the initial cookies are forwarded without change.
+//
+// • 当带有非空cookie Jar时转发“Cookie”头信息。
+// 由于每个重定向可能会改变cookie jar的状态，重定向可能会改变初始请求中设置的cookie。
+// 当转发“Cookie”头信息时，任何变化的cookies都将被省略，期望Jar会插入那些变化的cookies及其更新的值（假设来源匹配）。
+// 如果Jar是空的，则初始cookies会被不加更改地转发。
 type Client struct {
 	// Transport specifies the mechanism by which individual
 	// HTTP requests are made.
