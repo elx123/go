@@ -91,6 +91,8 @@ func (d Dir) Open(name string) (File, error) {
 // characters, regardless of host operating system convention.
 // See the FileServer function to convert a FileSystem to a Handler.
 //
+// 文件系统实现对命名文件集合的访问。 // 文件路径中的元素由斜杠 ('/', U+002F) // 字符分隔，无论主机操作系统约定如何。 // 查看 FileServer 函数将 FileSystem 转换为 Handler
+//
 // This interface predates the fs.FS interface, which can be used instead:
 // the FS adapter function converts an fs.FS to a FileSystem.
 type FileSystem interface {
