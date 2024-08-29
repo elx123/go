@@ -176,6 +176,7 @@ func DurationValue(v time.Duration) Value {
 
 // GroupValue returns a new [Value] for a list of Attrs.
 // The caller must not subsequently mutate the argument slice.
+// 调用者随后不得更改参数片。
 func GroupValue(as ...Attr) Value {
 	// Remove empty groups.
 	// It is simpler overall to do this at construction than

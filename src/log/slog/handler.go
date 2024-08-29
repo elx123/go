@@ -47,6 +47,13 @@ type Handler interface {
 	// Canceling the context should not affect record processing.
 	// (Among other things, log messages may be necessary to debug a
 	// cancellation-related problem.)
+	// 句柄处理记录。
+	// 只有当 Enabled 返回 true 时才会调用它。
+	// 上下文参数与 Enabled 相同。
+	// 它的存在只是为了让处理程序访问上下文的值。
+	// 取消上下文不应影响记录处理。
+	// 取消上下文不应影响记录处理（除其他外，日志信息可能是调试与取消上下文相关的问题所必需的）。
+	// 与取消相关的问题）。
 	//
 	// Handle methods that produce output should observe the following rules:
 	//   - If r.Time is the zero time, ignore the time.
@@ -62,6 +69,9 @@ type Handler interface {
 	// WithAttrs returns a new Handler whose attributes consist of
 	// both the receiver's attributes and the arguments.
 	// The Handler owns the slice: it may retain, modify or discard it.
+	// WithAttrs 返回一个新的处理程序，其属性包括
+	// 接收者的属性和参数。
+	// 处理程序拥有切片：它可以保留、修改或丢弃切片。
 	WithAttrs(attrs []Attr) Handler
 
 	// WithGroup returns a new Handler with the given group appended to
@@ -142,19 +152,30 @@ type HandlerOptions struct {
 	// ReplaceAttr is called to rewrite each non-group attribute before it is logged.
 	// The attribute's value has been resolved (see [Value.Resolve]).
 	// If ReplaceAttr returns a zero Attr, the attribute is discarded.
+	// 调用 ReplaceAttr 是为了在记录之前重写每个非组属性。
+	// 属性的值已被解析（参见 [Value.Resolve]）。
+	// 如果 ReplaceAttr 返回的 Attr 值为零，则该属性将被丢弃。
 	//
 	// The built-in attributes with keys "time", "level", "source", and "msg"
 	// are passed to this function, except that time is omitted
 	// if zero, and source is omitted if AddSource is false.
+	// 以 "时间"、"级别"、"来源 "和 "msg "为键的内置属性
+	// 都会传递给这个函数，但如果时间为零，则省略
+	// 如果为零，则省略时间；如果 AddSource 为 false，则省略源。
 	//
 	// The first argument is a list of currently open groups that contain the
 	// Attr. It must not be retained or modified. ReplaceAttr is never called
 	// for Group attributes, only their contents. For example, the attribute
 	// list
+	// 第一个参数是当前打开的组列表，其中包含
+	// Attr.不得保留或修改。对于组属性
+	// 只调用组属性的内容。例如，属性
+	// 列表
 	//
 	//     Int("a", 1), Group("g", Int("b", 2)), Int("c", 3)
 	//
 	// results in consecutive calls to ReplaceAttr with the following arguments:
+	// 结果是连续调用带有以下参数的 ReplaceAttr：
 	//
 	//     nil, Int("a", 1)
 	//     []string{"g"}, Int("b", 2)
